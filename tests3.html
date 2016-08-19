@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+	<form id="file-form">
+		<input type="file" name="images" id="file-select">
+		<button>Upload</button>
+	</form>
+
+	<script type="text/javascript">
+		var form = document.getElementById('file-form')
+
+		form.onsubmit = function(event) {
+			event.preventDefault();
+
+			var formData = new FormData()
+			var fileSelect = document.getElementById('file-select')
+			var files = fileSelect.files
+			var mimetype = null;
+
+			for (var i = 0; i < files.length; i++) {
+				var file = files[i];
+				formData.append('file', file)
+
+				mimetype = file.type
+			}
+
+			var xhr = new XMLHttpRequest();
+			var url = 'https://{BUCKET}.s3.amazonaws.com/uploads/5?AWSAccessKeyId={ACCESS_KEY}&content-type=image%2Fpng&Expires={EXPIRES}&Signature={SIGNATURE}';
+			
+			url = url.replace('{BUCKET}', '');
+			url = url.replace('{ACCESS_KEY}', '');
+			url = url.replace('{EXPIRES}', '');
+			url = url.replace('{SIGNATURE}', '');
+			
+			// Set up a handler for when the request finishes.
+			xhr.onload = function () {
+			  if (xhr.status === 200) {
+			    // File(s) uploaded.
+			    uploadButton.innerHTML = 'Upload';
+			  } else {
+			    alert('An error occurred!');
+			  }
+			};
+
+			xhr.open('PUT', url, true);
+			xhr.send(files[0])
+		}
+
+	</script>
+</body>
+</html>
